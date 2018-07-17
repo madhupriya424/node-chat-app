@@ -4,6 +4,7 @@
 //help to make connection to transfer or send data whether it is client to server or server to client. 
 // newEmail Event (server to client) - (from, text, createdAt)
 // createEmail Event (client to server) - (to, text, schedule Timestamp) 
+//Broadcasting different way to emit event on servers.It is a term to emit an event to server and to everybody but one specific user.
 
 const path = require('path');
 const http = require('http');
@@ -38,14 +39,34 @@ io.on('connection', (socket) => {   // here server print "New User connected" me
 // socket.on('createEmail', (newEmail) => {
 //     console.log('createEmail', newEmail);
 // });
+ 
+//socket.emit from Admin text welcome to chatApp
+socket.emit('newMessage', {
+    from : 'Admin', 
+    text : 'Welcome to chat App',
+    createdAt: new Date().getTime()
+});
+
+//socket.broadcast.emit from Admin text New User joined
+socket.broadcast.emit('newMessage', {
+    from : 'Admin', 
+    text : 'New User Joined',
+    createdAt: new Date().getTime()
+});
 
 socket.on('createMessage', (message) => {
     console.log('Message is created on server', message);
 
-    io.emit('newMessage', {   //emit to every single connection
-     from: message.from,
-     text: message.text,
-     createdAt: new Date().getTime()
+    // io.emit('newMessage', {   //emit to every single connection
+    //  from: message.from,
+    //  text: message.text,
+    //  createdAt: new Date().getTime()
+    // }); 
+
+    socket.broadcast.emit('newMessage', {  ////everyone will get this message other than this.
+        from: message.from,
+         text: message.text,
+         createdAt: new Date().getTime()
     }); 
 });
 
