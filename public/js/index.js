@@ -12,19 +12,27 @@ var socket = io(); //method loaded from the above library.here we are making the
             console.log('Disconnected from server client');
         });
 
-        socket.emit('createMessage', {
-            from: 'Frank',
-            text: 'Hi'
-        }, function(data) {
-            console.log('Got it', data);
+        socket.on('newMessage', function(message){
+            console.log('newMessage', message);
+            var li = jQuery('<li></li>');
+            li.text(`${message.from}: ${message.text}`);
+
+            jQuery('#messages').append(li);
         });
+
+        // socket.emit('createMessage', {
+        //     from: 'Frank',
+        //     text: 'Hi'
+        // }, function(data) {
+        //     console.log('Got it', data);
+        // });
 
         // socket.on('newEmail', function(name){
         //     console.log('New email',name);
         // });
 
         jQuery('#message-form').on('submit', function(e){
-            e.preventDefault();
+            e.preventDefault();    //to prevent the default behaviour
 
             socket.emit('createMessage', {
                 from: 'User',
@@ -34,6 +42,6 @@ var socket = io(); //method loaded from the above library.here we are making the
             });
         });
 
-        socket.on('newMessage', function(message){
-            console.log('New message in client', message);
-        });
+        // socket.on('newMessage', function(message){
+        //     console.log('New message in client', message);
+        // });
