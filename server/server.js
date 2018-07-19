@@ -54,8 +54,9 @@ socket.broadcast.emit('newMessage', {
     createdAt: new Date().getTime()
 });
 
-socket.on('createMessage', (message) => {
+socket.on('createMessage', (message, callback) => {
     console.log('Message is created on server', message);
+    callback('This is from server.');
 
     // io.emit('newMessage', {   //emit to every single connection
     //  from: message.from,

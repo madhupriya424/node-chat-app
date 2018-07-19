@@ -12,9 +12,28 @@ var socket = io(); //method loaded from the above library.here we are making the
             console.log('Disconnected from server client');
         });
 
+        socket.emit('createMessage', {
+            from: 'Frank',
+            text: 'Hi'
+        }, function(data) {
+            console.log('Got it', data);
+        });
+
         // socket.on('newEmail', function(name){
         //     console.log('New email',name);
         // });
+
+        jQuery('#message-form').on('submit', function(e){
+            e.preventDefault();
+
+            socket.emit('createMessage', {
+                from: 'User',
+                text: jQuery('[name=message]').val()
+            }, function() {
+
+            });
+        });
+
         socket.on('newMessage', function(message){
             console.log('New message in client', message);
         });
