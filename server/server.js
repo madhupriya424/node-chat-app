@@ -5,6 +5,7 @@
 // newEmail Event (server to client) - (from, text, createdAt)
 // createEmail Event (client to server) - (to, text, schedule Timestamp) 
 //Broadcasting different way to emit event on servers.It is a term to emit an event to server and to everybody but one specific user.
+//In this viseo we deploy our node app to live using heroku
 
 const path = require('path');
 const http = require('http');
@@ -57,7 +58,7 @@ socket.broadcast.emit('newMessage', {
 socket.on('createMessage', (message, callback) => {
     console.log('Message is created on server', message);
     callback('This is from server.');
-
+    
     // io.emit('newMessage', {   //emit to every single connection
     //  from: message.from,
     //  text: message.text,
@@ -68,9 +69,12 @@ socket.on('createMessage', (message, callback) => {
         from: message.from,
          text: message.text,
          createdAt: new Date().getTime()
-    }); 
+    });
+  
+    socket.on('createLocationMessge', (coords) => {
+        io.emit('newMessage', generateMessage('Admin', `${coords.latitude}, ${coords.longitude}`));
+    });
 });
-
 socket.on('disconnect', function(){
     console.log('User was disconnected server')
 });
