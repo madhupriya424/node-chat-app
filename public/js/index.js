@@ -1,3 +1,4 @@
+// a.attr: here if we provide the one value then it will fetch the value and return value Otherwise if we provide it two values then it will set values.
 var socket = io(); //method loaded from the above library.here we are making the req from the client server to open up the web socket and keep the connection open.
 
         socket.on('connect', () => {
@@ -20,6 +21,16 @@ var socket = io(); //method loaded from the above library.here we are making the
             jQuery('#messages').append(li);
         });
 
+        socket.on('newLocationMessage', function(message){
+            var li = jQuery('<li></li>');
+            var a = jQuery('<a target="_blank">My current location</a>'); //a target="_blank": it will help to open map in new tab.
+
+            li.text(`${message.from}: `);
+            a.attr('href', message.url);   //above*
+            li.append(a);
+            jQuery('#messages').append(li);
+        });
+
         // socket.emit('createMessage', {
         //     from: 'Frank',
         //     text: 'Hi'
@@ -34,11 +45,13 @@ var socket = io(); //method loaded from the above library.here we are making the
         jQuery('#message-form').on('submit', function(e){
             e.preventDefault();    //to prevent the default behaviour
 
-            socket.emit('createMessage', {
-                from: 'User',
-                text: jQuery('[name=message]').val()
-            }, function() {
+            var messageTextBox = jQuery('[name=message]');
 
+            socket.emit('createMessage', {     //socket.emit used to send data to particular people and io.emit used to send in all chats
+                from: 'User',
+                text: messageTextBox.val()
+            }, function() {
+                messageTextBox.val('')
             });
         });
 
@@ -47,13 +60,18 @@ var socket = io(); //method loaded from the above library.here we are making the
             if(!navigator.geolocation){
                 return alert('Geolocation not supported by your browser.');
             }
+             
+            locationButton.attr('disabled', 'disabled').text('Send location...');
 
             navigator.geolocation.getCurrentPosition(function(position){
-               socket.emit('createLocationMessage', {
+                locationButton.removeAttr('disabled');
+                
+                socket.emit('createLocationMessage', {
                    latitude: position.coords.latitude,
                    longitude: position.coords.longitude
-               });
+                });
             }, function(){
+                locationButton.removeAttr('disabled');
                 alert('Unable to fetch location.');
             });
         });

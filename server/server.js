@@ -12,7 +12,7 @@ const http = require('http');
 const express = require('express');
 const socketIO = require('socket.io');
 
-//const {generateMessage} = require('./utils/message');
+const {generateMessage, generateLocationMessage} = require('./utils/message');
 const publicPath = path.join(__dirname, '../public');
 const port = process.env.Port || 3000;    //for heroku configuration
 var app = express();
@@ -57,29 +57,31 @@ socket.broadcast.emit('newMessage', {
 
 socket.on('createMessage', (message, callback) => {
     console.log('Message is created on server', message);
-    callback('This is from server.');
-    
-    // io.emit('newMessage', {   //emit to every single connection
+    io.emit('newMessage', generateMessage(message.from, message.text));  
+    callback();
+});
+ 
+// io.emit('newMessage', {   //emit to every single connection
     //  from: message.from,
     //  text: message.text,
     //  createdAt: new Date().getTime()
     // }); 
 
-    socket.broadcast.emit('newMessage', {  ////everyone will get this message other than this.
-        from: message.from,
-         text: message.text,
-         createdAt: new Date().getTime()
-    });
+    // socket.broadcast.emit('newMessage', {  ////everyone will get this message other than this.
+    //     from: message.from,
+    //      text: message.text,
+    //      createdAt: new Date().getTime()
+    // });
   
-    socket.on('createLocationMessge', (coords) => {
-        io.emit('newMessage', generateMessage('Admin', `${coords.latitude}, ${coords.longitude}`));
+    socket.on('createLocationMessage', (coords) => {
+        io.emit('newLocationMessage', generateLocationMessage('Admin', coords.latitude, coords.longitude));
     });
-});
+
 socket.on('disconnect', function(){
     console.log('User was disconnected server')
 });
-
 });
+
 server.listen(port, function() {              //behind the scene it will call "http.createServer(app);" method 
     console.log(`Server is up on port ${port}`);
 });
