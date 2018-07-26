@@ -1,5 +1,31 @@
 // a.attr: here if we provide the one value then it will fetch the value and return value Otherwise if we provide it two values then it will set values.
-var socket = io(); //method loaded from the above library.here we are making the req from the client server to open up the web socket and keep the connection open.
+        var socket = io(); //method loaded from the above library.here we are making the req from the client server to open up the web socket and keep the connection open.
+
+        function scrollToBottom() {
+            //selectors
+            var messages = jQuery('#messages');
+            var newMessage = messages.children('li:last-child')  //it will select the list item or paragraph here we want to select our list item that  are our last child by using our last-child modifier.
+
+            //Heights //messages.prop():- which gives us cross bowser way to fetch a properties this is a alternative of jquery to doing it without jquery it makes sure it works across browsers regardness of the way they call prop.
+            var clientHeight  =  messages.prop('clientHeight');
+            var scrollTop = messages.prop('scrollTop');
+            var scrollHeight = messages.prop('scrollHeight');
+            var newMessageHeight = newMessage.innerHeight(); //this is going to calculate the height of the message taking into account the padding that we are also applied by using css.
+            var lastMessageHeight = newMessage.prev().innerHeight(); //this moves us to the previous child so if we were at last list item then we are now at second to last list item and we can get the height of this by innerHeight().
+
+            if(clientHeight + scrollTop + newMessageHeight + lastMessageHeight >= scrollHeight){
+                // console.log('clientHeight : ', clientHeight);
+                // console.log('scrollTop: ', scrollTop);
+                // console.log('scrollHeight: ', scrollHeight);
+                // console.log('newMessageHeight: ', newMessageHeight);
+                // console.log('lastMessageHeight: ', lastMessageHeight);                        
+                // console.log('Should scroll');
+                messages.scrollTop(scrollHeight);
+            }
+        }
+
+
+
 
         socket.on('connect', () => {
             console.log('Connected to server client'); //client prints "Connected to server" message on console.
@@ -24,6 +50,7 @@ var socket = io(); //method loaded from the above library.here we are making the
             }); //Mustache.render() takes the input  
                 
             jQuery('#messages').append(html);
+            scrollToBottom();
 
             // var formattedTime = moment(message.createdAt).format('h:mm a');
             // // console.log('newMessage', message);
@@ -42,6 +69,7 @@ var socket = io(); //method loaded from the above library.here we are making the
                 url: message.url
             }); 
             jQuery('#messages').append(html);
+            scrollToBottom();
         });
 
         // socket.on('newLocationMessage', function(message){
